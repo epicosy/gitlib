@@ -7,3 +7,13 @@ class DiffLineType(Enum):
     """
     ADDITION = "+"
     DELETION = "-"
+
+
+class GithubUrlType(Enum):
+    REPOSITORY = "repository"
+    COMMIT = "commit"
+    ISSUE = "issue"
+    PULL_REQUEST = "pull_request"
+    PR_COMMIT = "pr_commit"
+
+    # TODO: add more types if necessary
