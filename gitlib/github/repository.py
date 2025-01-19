@@ -16,6 +16,10 @@ class GitRepo:
         self.repo = repo
 
     @property
+    def commits_count(self) -> int:
+        return self.repo.get_commits().totalCount
+
+    @property
     def language(self) -> str:
         return self.repo.language
 
