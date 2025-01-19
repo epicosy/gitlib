@@ -15,6 +15,34 @@ class GitRepo:
     def __init__(self, repo: Repository):
         self.repo = repo
 
+    @property
+    def langauge(self) -> str:
+        return self.repo.language
+
+    @property
+    def description(self) -> str:
+        return self.repo.description
+
+    @property
+    def size(self) -> int:
+        return self.repo.size
+
+    @property
+    def stars(self) -> int:
+        return self.repo.stargazers_count
+
+    @property
+    def forks(self) -> int:
+        return self.repo.forks_count
+
+    @property
+    def watchers(self) -> int:
+        return self.repo.watchers_count
+
+    @property
+    def name(self) -> str:
+        return self.repo.name
+
     def get_commit(self, sha: str, raise_err: bool = False) -> GitCommit | None:
         # Ignore unavailable commits
         try:
