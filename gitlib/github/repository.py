@@ -16,7 +16,7 @@ class GitRepo:
         self.repo = repo
 
     @property
-    def langauge(self) -> str:
+    def language(self) -> str:
         return self.repo.language
 
     @property
