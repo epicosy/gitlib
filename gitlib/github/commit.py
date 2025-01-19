@@ -16,6 +16,30 @@ class GitCommit:
         self._diff = None
 
     @property
+    def html_url(self):
+        return self.commit.html_url
+
+    @property
+    def message(self):
+        return self.commit.commit.message
+
+    @property
+    def sha(self):
+        return self.commit.sha
+
+    @property
+    def date(self):
+        return self.commit.commit.author.date
+
+    @property
+    def stats(self):
+        return self.commit.stats
+
+    @property
+    def state(self):
+        return self.commit.get_combined_status().state
+
+    @property
     def files(self) -> List[GitFile]:
         if self._files is None:
             self._files = [GitFile(file) for file in self.commit.files]
