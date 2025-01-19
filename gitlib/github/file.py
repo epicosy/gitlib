@@ -1,5 +1,6 @@
 import requests
 
+from pathlib import Path
 from github.File import File
 from gitlib.models.diff.patch import Patch
 from gitlib.parsers.patch.git import GitPatchParser
@@ -10,6 +11,38 @@ class GitFile:
     def __init__(self, file: File):
         self.file = file
         self._content = None
+
+    @property
+    def raw_url(self) -> str:
+        return self.file.raw_url
+
+    @property
+    def filename(self) -> str:
+        return self.file.filename
+
+    @property
+    def status(self) -> str:
+        return self.file.status
+
+    @property
+    def changes(self):
+        return self.file.changes
+
+    @property
+    def additions(self) -> int:
+        return self.file.additions
+
+    @property
+    def deletions(self) -> int:
+        return self.file.deletions
+
+    @property
+    def patch(self):
+        return self.file.patch
+
+    @property
+    def extension(self) -> str:
+        return Path(self.filename).suffix
 
     @property
     def content(self) -> str:
