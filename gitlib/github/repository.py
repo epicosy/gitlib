@@ -16,6 +16,14 @@ class GitRepo:
         self.repo = repo
 
     @property
+    def id(self):
+        return self.repo.id
+
+    @property
+    def owner(self):
+        return self.repo.owner
+
+    @property
     def commits_count(self) -> int:
         return self.repo.get_commits().totalCount
 

@@ -16,6 +16,10 @@ class GitCommit:
         self._diff = None
 
     @property
+    def parents(self):
+        return self.commit.parents
+
+    @property
     def html_url(self):
         return self.commit.html_url
 

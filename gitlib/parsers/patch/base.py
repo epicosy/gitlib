@@ -17,15 +17,17 @@ class PatchParser(ABC):
         diff_hunks = []
         current_diff_hunk = None
         diff_hunk_lines = []
+        hunk_ptr = 1
 
-        for line_id, line in enumerate(self.lines):
+        for line in self.lines:
             if line.startswith("@@ "):
                 if current_diff_hunk:
                     diff_hunk = current_diff_hunk(diff_hunk_lines)
                     diff_hunks.append(diff_hunk)
 
-                current_diff_hunk = self.diff_hunk_parser(line, line_id)
+                current_diff_hunk = self.diff_hunk_parser(line, hunk_ptr)
                 diff_hunk_lines = []
+                hunk_ptr += 1
 
             if not current_diff_hunk:
                 raise ValueError("Misaligned diff hunk")
@@ -40,16 +42,15 @@ class PatchParser(ABC):
 
 
 class DiffHunkParser:
-    def __init__(self, header: str, start: int):
+    def __init__(self, header: str, order: int):
         self.old_start, self.new_start = parse_hunk_header(header)
+        self.order = order
 
         # get the start line numbers from the diff hunk header.
         self.lineno_ptrs = {
             DiffLineType.DELETION: self.old_start,
             DiffLineType.ADDITION: self.new_start
         }
-
-        self.start = start
 
     def __call__(self, lines: List[str]) -> DiffHunk:
         """
@@ -81,6 +82,7 @@ class DiffHunkParser:
             self.lineno_ptrs[diff_line_type] += 1
 
         return DiffHunk(
+            order=self.order,
             old_lines=diff_lines[DiffLineType.DELETION],
             new_lines=diff_lines[DiffLineType.ADDITION],
             old_start=self.old_start,

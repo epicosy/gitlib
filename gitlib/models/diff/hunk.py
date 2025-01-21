@@ -5,6 +5,7 @@ from gitlib.models.diff.line import DiffLine
 
 
 class DiffHunk(BaseModel):
+    order: int
     old_lines: List[DiffLine]
     new_lines: List[DiffLine]
     old_start: int
@@ -29,7 +30,7 @@ class DiffHunk(BaseModel):
         return len(self.new_lines)
 
     def __str__(self):
-        header = f"{self.__class__.__name__}({self.old_start}, {self.new_start})"
+        header = f"{self.order} {self.__class__.__name__}({self.old_start}, {self.new_start})"
 
         for line in self.ordered_lines:
             if line.skip:
