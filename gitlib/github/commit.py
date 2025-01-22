@@ -6,18 +6,18 @@ from github.Commit import Commit
 from gitlib.models.diff import Diff
 from gitlib.github.file import GitFile
 from gitlib.parsers.diff.git import GitDiffParser
-from gitlib.parsers.diff.unified import UnifiedDiffParser
 
 
 class GitCommit:
-    def __init__(self, commit: Commit):
+    def __init__(self, commit: Commit, repo_id: int):
+        self.repo_id = repo_id
         self.commit = commit
         self._files = None
         self._diff = None
 
     @property
     def parents(self):
-        return self.commit.parents
+        return [GitCommit(parent, self.repo_id) for parent in self.commit.parents]
 
     @property
     def html_url(self):
@@ -47,7 +47,19 @@ class GitCommit:
     def files(self) -> List[GitFile]:
         if self._files is None:
             self._files = [GitFile(file) for file in self.commit.files]
+
         return self._files
+
+    def get_file(self, file: GitFile) -> GitFile:
+        """
+            Get the file from the commit.
+
+            :param file: The subsequent file to get in the current version.
+        """
+        # look for the file in the list of files
+        for f in self.files:
+            if f.filename == file.filename:
+                return f
 
     @property
     def diff(self) -> str:
@@ -57,26 +69,17 @@ class GitCommit:
 
         return self._diff
 
-    def get_diff(self, unified: bool = False) -> Diff:
+    def get_diff(self) -> Diff:
         """
             By default, the diff is obtained by using the diff URL.
-
-            :param unified: If True, uses UnifiedPatchParser over the self.commit.files to get the diff.
         """
-        if unified:
-            patches = []
 
-            for file in self.files:
-                # TODO: implement the case when the commit has more than one parent
-                # if len(self.commit.parents) > 1:
-                #    raise NotImplemented(f"Commit {self.commit.sha} has more than one parent.")
+        parser = GitDiffParser(self.diff)
+        patches = parser()
 
-                # TODO: change this to work for the UnifiedPatchParser by passing the old_file
-                patch = file.get_patch()
-                patches.append(patch)
-
-            parser = UnifiedDiffParser(patches)
-        else:
-            parser = GitDiffParser(self.diff)
-
-        return parser()
+        # TODO: temporary solution to represent and keep track of the diff
+        return Diff(
+            repo_id=self.repo_id,
+            commit_sha=self.commit.sha,
+            patches=patches
+        )

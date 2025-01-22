@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from gitlib.models.diff import Diff
+from gitlib.models.diff.patch import Patch
 from gitlib.parsers.diff.base import DiffParser
 from gitlib.parsers.patch.git import GitPatchParser
 from gitlib.parsers.diff.helpers import is_valid_patch
@@ -16,7 +16,7 @@ class GitDiffParser(DiffParser):
         super().__init__(**kwargs)
         self.diff_text = diff_text
 
-    def __call__(self) -> Diff:
+    def __call__(self) -> List[Patch]:
         patches = []
 
         # TODO: find a better way to split the diff text into patches
@@ -26,7 +26,7 @@ class GitDiffParser(DiffParser):
             patch = patch_parser()
             patches.append(patch)
 
-        return Diff(patches=patches)
+        return patches
 
     def _process_patch(self, patch: str) -> Tuple[List[str], str, str] | None:
         # Ensure the block has at least two lines, also, we are considering only modifications

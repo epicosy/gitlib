@@ -12,6 +12,8 @@ class PatchParser(ABC):
     def __init__(self, **kwargs):
         self.lines = None
         self.diff_hunk_parser = None
+        self.file_name = None
+        self.old_file_name = None
 
     def __call__(self) -> Patch:
         diff_hunks = []
@@ -35,10 +37,15 @@ class PatchParser(ABC):
             diff_hunk_lines.append(line)
 
         # Process the last diff hunk
-        diff_hunk = current_diff_hunk(diff_hunk_lines)
-        diff_hunks.append(diff_hunk)
+        if diff_hunk_lines:
+            diff_hunk = current_diff_hunk(diff_hunk_lines)
+            diff_hunks.append(diff_hunk)
 
-        return Patch(hunks=diff_hunks)
+        return Patch(
+            old_file=self.old_file_name,
+            new_file=self.file_name,
+            hunks=diff_hunks
+        )
 
 
 class DiffHunkParser:

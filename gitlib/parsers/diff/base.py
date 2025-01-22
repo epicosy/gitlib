@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, List
 
-from gitlib.models.diff import Diff
+
 from gitlib.models.diff.patch import Patch
 from gitlib.common.constants import DEFAULT_FILENAMES_TO_SKIP
 
@@ -16,7 +16,7 @@ class DiffParser:
     def __iter__(self) -> Iterator[Patch]:
         return iter(self.patches)
 
-    def __call__(self) -> Diff:
+    def __call__(self) -> List[Patch]:
         pass
 
     def _is_valid_extension(self, file_path: str) -> bool:

@@ -2,9 +2,11 @@ from typing import List
 from github.Repository import Repository
 from github import GithubException, RateLimitExceededException
 
-from gitlib.common.exceptions import GitLibException
+
 from gitlib.models.diff import Diff
 from gitlib.github.commit import GitCommit
+from gitlib.common.exceptions import GitLibException
+from gitlib.parsers.patch.unified import UnifiedPatchParser
 
 
 class GitRepo:
@@ -59,7 +61,7 @@ class GitRepo:
         # Ignore unavailable commits
         try:
             # self.app.log.info(f"Getting commit {commit_sha}")
-            return GitCommit(self.repo.get_commit(sha=sha))
+            return GitCommit(self.repo.get_commit(sha=sha), repo_id=self.id)
         except (ValueError, GithubException):
             err_msg = f"Commit {sha} for repo {self.repo.name} unavailable."
         except RateLimitExceededException as rle:
@@ -72,9 +74,41 @@ class GitRepo:
 
         return None
 
-    def get_diff(self) -> Diff:
-        # TODO: use the repo.compare(base, head) to get the diff between the commit and its parent
-        pass
+    def get_diff(self, base: str, head: str) -> Diff:
+        """
+            Get the diff between two commits.
+
+            :param base: The base commit sha.
+            :param head: The head commit sha.
+
+            :return: A Diff object.
+        """
+
+        # make sure the commits are available
+        base_commit = self.get_commit(base)
+        head_commit = self.get_commit(head)
+
+        # make sure the base commit precedes the head commit
+        if base_commit.date > head_commit.date:
+            raise GitLibException(f"Base commit {base} does not precede head commit {head}")
+
+        patches = []
+
+        for file in head_commit.files:
+            base_file = self.repo.get_contents(file.filename, ref=base_commit.sha)
+            base_content = base_file.decoded_content.decode("utf-8")
+
+            parser = UnifiedPatchParser(a_str=base_content, b_str=file.content,
+                                        old_file=base_file.path, new_file=file.filename)
+            patch = parser()
+
+            patches.append(patch)
+
+        return Diff(
+            repo_id=self.id,
+            commit_sha=head_commit.sha,
+            patches=patches
+        )
 
     def get_versions(self, limit: int = None) -> List[str]:
         releases = self.repo.get_releases()

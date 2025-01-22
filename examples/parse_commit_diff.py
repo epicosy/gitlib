@@ -1,7 +1,6 @@
-from pygit2 import Diff
 from gitlib import GitClient
 
-TOKEN = "YOUR_OWN_TOKEN"
+TOKEN = "YOUR_GITHUB_TOKEN_HERE"
 
 client = GitClient(token=TOKEN)
 repo = client.get_repo(owner="ArtifexSoftware", project="mujs")
@@ -10,18 +9,12 @@ print(repo)
 commit = repo.get_commit(sha="fa3d30fd18c348bb4b1f3858fb860f4fcd4b2045")
 print(commit)
 
-diff = commit.get_diff(unified=True)
+commit_diff = commit.get_diff()
 
-print(diff)
+print("# COMMIT DIFF #")
+print(commit_diff)
 
-# Compare with pygit2 diff
-parsed_diff = Diff.parse_diff(commit.diff)
 
-for patch in parsed_diff:
-    print(patch.delta.old_file.path, patch.delta.new_file.path)
-    print(patch.delta.similarity)
-
-    for hunk in patch.hunks:
-        print("\t", hunk.old_start, hunk.new_start, hunk.header)
-        for line in hunk.lines:
-            print("\t\t", line.origin, line.old_lineno, line.new_lineno)
+print("# REPO UNIFIED DIFF #")
+repo_diff = repo.get_diff(commit.parents[0].sha, commit.sha)
+print(repo_diff)
