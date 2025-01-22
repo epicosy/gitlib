@@ -6,10 +6,10 @@ from gitlib.models.diff.line import DiffLine
 
 class DiffHunk(BaseModel):
     order: int
-    old_lines: List[DiffLine]
-    new_lines: List[DiffLine]
     old_start: int
     new_start: int
+    old_lines: List[DiffLine]
+    new_lines: List[DiffLine]
 
     @property
     def ordered_lines(self) -> List[DiffLine]:

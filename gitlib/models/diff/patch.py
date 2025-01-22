@@ -5,9 +5,9 @@ from gitlib.models.diff.hunk import DiffHunk
 
 
 class Patch(BaseModel):
-    hunks: List[DiffHunk]
     old_file: str
     new_file: str
+    hunks: List[DiffHunk]
 
     def __iter__(self) -> Iterator[DiffHunk]:
         return iter(self.patches)

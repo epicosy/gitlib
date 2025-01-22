@@ -5,8 +5,8 @@ from gitlib.common.enums import DiffLineType
 
 class DiffLine(BaseModel):
     type: DiffLineType
-    content: str
     lineno: int
+    content: str
     skip: bool = False
 
     @property
