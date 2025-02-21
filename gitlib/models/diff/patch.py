@@ -4,6 +4,7 @@ from typing import List, Iterator
 from gitlib.models.diff.hunk import DiffHunk
 
 
+# TODO: should have the sha of the file that was changed
 class Patch(BaseModel):
     old_file: str
     new_file: str

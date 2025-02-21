@@ -15,3 +15,7 @@ print(parser())
 parser = GithubUrlParser(url="https://github.com/moby/moby/pull/35399/commits/a21ecdf3c8a343a7c94e4c4d01b178c87ca7aaa1")
 
 print(parser())
+
+parser = GithubUrlParser(url="https://github.com/vincentbernat/lldpd/releases")
+
+print(parser())

@@ -23,7 +23,10 @@ class GithubUrlParser:
 
     def __call__(self) -> GithubUrl | None:
         if self.is_github_url():
-            # Check if the URL is a GitHub commit
+            # Clean up the URL when it ends with /releases
+            if self.url.path.endswith("/releases"):
+                self.url = HttpUrl(str(self.url).replace("/releases", ""))
+
             for model_class, pattern in GITHUB_URL_PATTERNS.items():
                 match = re.match(pattern, self.url.path)
 
