@@ -21,7 +21,12 @@ class GitDiffParser(DiffParser):
 
         # TODO: find a better way to split the diff text into patches
         for patch_str in filter(lambda x: x != '', self.diff_text.split("diff --git ")):
-            processed_patch, old_path, new_path = self._process_patch(patch_str)
+            result = self._process_patch(patch_str)
+
+            if result is None:
+                continue
+
+            processed_patch, old_path, new_path = result
             patch_parser = GitPatchParser(processed_patch, new_path, old_path)
             patch = patch_parser()
             patches.append(patch)

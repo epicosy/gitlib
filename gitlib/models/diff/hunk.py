@@ -12,6 +12,14 @@ class DiffHunk(BaseModel):
     new_lines: List[DiffLine]
 
     @property
+    def old(self) -> str:
+        return '\n'.join(line.content for line in self.old_lines)
+
+    @property
+    def new(self) -> str:
+        return '\n'.join(line.content for line in self.new_lines)
+
+    @property
     def ordered_lines(self) -> List[DiffLine]:
         """
         Returns all lines (old and new) in a single list sorted by line number.
