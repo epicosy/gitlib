@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Optional
 from github.Repository import Repository
 from github import GithubException, RateLimitExceededException
 
-
 from gitlib.models.diff import Diff
+from gitlib.models.submodule import Submodules
+
 from gitlib.github.commit import GitCommit
 from gitlib.common.exceptions import GitLibException
 from gitlib.parsers.patch.unified import UnifiedPatchParser
@@ -126,3 +127,24 @@ class GitRepo:
                 return [tag.name for tag in tags[:limit]]
             else:
                 return [tag.name for tag in tags]
+
+    def get_submodules(self) -> Optional[Submodules]:
+        """
+            Get the list of submodules in the repository.
+
+            :return: A list of submodule names.
+        """
+
+        try:
+            gitmodules_file = self.repo.get_contents('.gitmodules')
+
+            if gitmodules_file:
+                content = gitmodules_file.decoded_content.decode('utf-8')
+                submodules = Submodules.parse_gitmodules(self.owner.name, content)
+
+                return submodules
+
+        except GithubException as e:
+            print(f"Error getting submodules: {e}")
+
+        return None
