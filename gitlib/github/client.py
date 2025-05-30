@@ -1,6 +1,6 @@
 
 from github import Github
-from github import RateLimitExceededException, UnknownObjectException
+from github import RateLimitExceededException, UnknownObjectException, GithubException
 
 from gitlib.github.repository import GitRepo
 from gitlib.common.exceptions import GitLibException
@@ -36,6 +36,8 @@ class GitClient:
             err_msg = f"Rate limit exhausted: {rle}"
         except UnknownObjectException:
             err_msg = f"Repo not found. Skipping {owner}/{project} ..."
+        except GithubException as ge:
+            err_msg = f"Error getting repo: {ge}"
 
         if raise_err:
             raise GitLibException(err_msg)
