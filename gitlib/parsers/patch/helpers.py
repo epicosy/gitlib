@@ -36,6 +36,10 @@ def is_change_line(line: str) -> bool:
     :param line: The line to check.
     :return: True if the line is a change line.
     """
+
+    if len(line.strip()) == 0:
+        return False
+
     return line[0] in ["-", "+"]
 
 
