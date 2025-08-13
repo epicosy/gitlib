@@ -1,5 +1,4 @@
 import string
-import numpy as np
 
 from typing import List, Tuple
 from itertools import accumulate
@@ -76,27 +75,20 @@ def shift_range(orig_one_line: str, formatted: str, included_chars: set):
     """
     # Split the formatted string into lines and count included characters in each line
     formatted_lines = formatted.splitlines()
-    formatted_char_count = [len([ch for ch in line if ch in included_chars]) for line in formatted_lines]
+    formatted_char_count = [sum(1 for ch in line if ch in included_chars) for line in formatted_lines]
 
     # Calculate cumulative sum of included characters for each line
-    formatted_range = np.array(list(accumulate(formatted_char_count)))
+    formatted_range = list(accumulate(formatted_char_count))
 
-    # Compute how much to shift the range in each line of the formatted text
+    # Process original string and shift ranges
     for pos, ch in enumerate(orig_one_line):
         if ch not in included_chars:
-            # Create an array to store the amount of increment needed for each line
-            increments = np.zeros_like(formatted_range)
+            # Find indices where range >= pos
+            for idx, val in enumerate(formatted_range):
+                if val >= pos:
+                    formatted_range[idx] += 1
 
-            # Get the indices of the elements greater than or equal to the current position
-            gt_excluded_pos = np.argwhere(formatted_range >= pos)
-
-            # Increment the elements at those indices
-            increments[gt_excluded_pos] += 1
-
-            # Apply the increments to shift the ranges
-            formatted_range += increments
-
-    return list(formatted_range)
+    return formatted_range
 
 
 def convert_column_pos_to_range(positions):
