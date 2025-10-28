@@ -11,7 +11,7 @@ class Patch(BaseModel):
     hunks: List[DiffHunk]
 
     def __iter__(self) -> Iterator[DiffHunk]:
-        return iter(self.patches)
+        return iter(self.hunks)
 
     def __str__(self):
         return "\n".join(str(hunk) for hunk in self.hunks)
