@@ -1,3 +1,4 @@
+import re
 from gitlib.common.enums import GithubUrlType
 
 
@@ -22,3 +23,5 @@ GITHUB_URL_PATTERNS = {
     GithubUrlType.PR_COMMIT: f"{REPO_PATH}/pull/{NUMBER_GROUP}/commits/{SHA_GROUP}",
     GithubUrlType.PULL_REQUEST: f"{REPO_PATH}/pull/{NUMBER_GROUP}"
 }
+
+ISSUE_PATTERN = re.compile(r'https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/issues/(\d+)')
