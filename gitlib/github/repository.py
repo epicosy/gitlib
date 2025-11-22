@@ -138,12 +138,15 @@ class GitRepo:
         # 3) No commit found in this issue or references
         return None
 
-    def get_diff(self, base: Union[GitCommit, str], head: Union[GitCommit, str]) -> Diff:
+    def get_diff(
+            self, base: Union[GitCommit, str], head: Union[GitCommit, str], files: List[str] = None
+    ) -> Optional[Diff]:
         """
             Get the diff between two commits.
 
             :param base: The base commit sha.
             :param head: The head commit sha.
+            :param files: A list of file paths to include in the diff.
 
             :return: A Diff object.
         """
@@ -165,7 +168,16 @@ class GitRepo:
 
         patches = []
 
-        for file in head_commit.files:
+        if files:
+            target_files = [file for file in head_commit.files if file.filename in files]
+        else:
+            target_files = head_commit.files
+
+        if len(target_files) == 0:
+            print(f"Provided files not found in the head.")
+            return None
+
+        for file in target_files:
             try:
                 print(f"Loading base file {file.filename} ...")
                 base_file = self.repo.get_contents(file.filename, ref=base_commit.sha)
