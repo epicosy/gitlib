@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 from github.Repository import Repository
-from github import GithubException, RateLimitExceededException
+from github import GithubException, RateLimitExceededException, UnknownObjectException
 
 from gitlib.models.diff import Diff
 from gitlib.models.submodule import Submodules
@@ -138,7 +138,7 @@ class GitRepo:
         # 3) No commit found in this issue or references
         return None
 
-    def get_diff(self, base: str, head: str) -> Diff:
+    def get_diff(self, base: Union[GitCommit, str], head: Union[GitCommit, str]) -> Diff:
         """
             Get the diff between two commits.
 
@@ -149,8 +149,15 @@ class GitRepo:
         """
 
         # make sure the commits are available
-        base_commit = self.get_commit(base)
-        head_commit = self.get_commit(head)
+        if not isinstance(base, GitCommit):
+            base_commit = self.get_commit(base)
+        else:
+            base_commit = base
+
+        if not isinstance(head, GitCommit):
+            head_commit = self.get_commit(head)
+        else:
+            head_commit = head
 
         # make sure the base commit precedes the head commit
         if base_commit.date > head_commit.date:
@@ -159,7 +166,13 @@ class GitRepo:
         patches = []
 
         for file in head_commit.files:
-            base_file = self.repo.get_contents(file.filename, ref=base_commit.sha)
+            try:
+                print(f"Loading base file {file.filename} ...")
+                base_file = self.repo.get_contents(file.filename, ref=base_commit.sha)
+            except UnknownObjectException as uoe:
+                print(f"Error getting base file {file.filename}: {uoe}")
+                continue
+
             base_content = base_file.decoded_content.decode("utf-8")
 
             parser = UnifiedPatchParser(a_str=base_content, b_str=file.content,
